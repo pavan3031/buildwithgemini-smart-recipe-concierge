@@ -5,7 +5,15 @@
 
 ---
 
-## 📽️ Feature Launch Demos
+## 🎬 Product Launch Demo
+
+![Smart Recipe Concierge Full Application Demo](demo.gif)
+
+*Watch the Smart Recipe Concierge in action: searching the digital household pantry in Firestore, retrieving grounded historical remedy wisdom via Vertex AI RAG Engine, and rendering rich A2UI recipe cards with AI-generated dish photography.*
+
+---
+
+## 📽️ Feature Launch Breakdown
 
 ### 1. 🗄️ Digital Household Pantry Management
 Queries the live Google Cloud Firestore `pantry_inventory` database to retrieve available ingredients, quantities, and expiration dates.
@@ -143,19 +151,27 @@ Open your browser to the local server port (default `8080`) to interact with the
 To record individual Playwright screen recordings of the agent features:
 
 ```bash
-# 1. Pantry Search Demo
+# 1. Full Multi-Turn Demo
 NODE_PATH=./node_modules node .agents/skills/record-demo/record-agent.js \
-  -q "Search my digital pantry and list ingredients" \
+  -q "Inspect my digital pantry and list ingredients" \
+  -q "Consult the herbal guide for a natural cough remedy" \
+  -q "Find an authentic Italian pasta recipe and show image" \
+  --wait 30000 \
+  -o agent_demo.webm
+
+# 2. Pantry Search Demo
+NODE_PATH=./node_modules node .agents/skills/record-demo/record-agent.js \
+  -q "Inspect my digital pantry and list ingredients" \
   --wait 15000 \
   -o pantry_demo.webm
 
-# 2. RAG Engine Herbal Remedy Demo
+# 3. RAG Engine Herbal Remedy Demo
 NODE_PATH=./node_modules node .agents/skills/record-demo/record-agent.js \
   -q "Consult the medical guide for a natural herbal cough remedy" \
   --wait 15000 \
   -o rag_demo.webm
 
-# 3. Image Generation & Cloud Storage Demo
+# 4. Image Generation & Cloud Storage Demo
 NODE_PATH=./node_modules node .agents/skills/record-demo/record-agent.js \
   -q "Generate a vibrant dish photo of an authentic Italian pasta recipe" \
   --wait 30000 \
@@ -179,6 +195,7 @@ smart-recipe-concierge/
 │       └── index.html         # Custom glassmorphic web UI with Marked.js & A2UI renderer
 ├── agents-cli-manifest.yaml   # Agents CLI deployment configuration
 ├── pyproject.toml             # Python package definition and dependencies
+├── demo.gif                   # Full application launch demo GIF
 ├── pantry_demo.gif            # Digital Pantry Search feature demo GIF
 ├── rag_demo.gif               # Grounded RAG Search feature demo GIF
 ├── image_demo.gif             # Generative Dish Photography feature demo GIF
