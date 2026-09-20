@@ -1,21 +1,36 @@
 # 🥗 Smart Recipe Concierge
 
 > **The AI-Powered Culinary Assistant & Digital Household Pantry**  
-> *Built with Google Agent Development Kit (ADK), Gemini 2.5 Flash, Vertex AI Agent Runtime, Firestore, Cloud Storage, Vertex AI Memory Bank, RAG Engine, and A2UI.*
+> *Built with Google Agent Development Kit (ADK), Gemini 2.5 Flash, Firestore, Cloud Storage, Vertex AI Memory Bank, RAG Engine, and A2UI.*
 
 ---
 
-## 🎬 Product Launch Demo
+## 📽️ Feature Launch Demos
 
-![Smart Recipe Concierge Live Demo](demo.gif)
+### 1. 🗄️ Digital Household Pantry Management
+Queries the live Google Cloud Firestore `pantry_inventory` database to retrieve available ingredients, quantities, and expiration dates.
 
-*Watch the Smart Recipe Concierge in action: searching the digital household pantry in Firestore, retrieving grounded historical remedy wisdom via Vertex AI RAG Engine, and rendering rich A2UI recipe cards with AI-generated dish photography.*
+![Digital Household Pantry Search Demo](pantry_demo.gif)
+
+---
+
+### 2. 🌿 Grounded Historical Remedy Search (RAG Engine)
+Performs semantic vector search over an indexed historical culinary and herbal reference guide via Vertex AI RAG Engine.
+
+![Grounded Historical Remedy Search Demo](rag_demo.gif)
+
+---
+
+### 3. 🎨 Generative Dish Photography & Cloud Storage Upload
+Generates high-resolution food photos on demand using `gemini-3.1-flash-lite-image`, uploads JPEG assets directly to a public Google Cloud Storage bucket, and renders rich A2UI cards.
+
+![Generative Dish Photography & Cloud Storage Upload Demo](image_demo.gif)
 
 ---
 
 ## 🚀 Product Overview
 
-**Smart Recipe Concierge** is an agentic application designed to transform home cooking, meal planning, and digital kitchen inventory management. Built on Google Cloud's Agent Development Kit (ADK) and deployed to **Vertex AI Agent Runtime**, the agent goes beyond standard conversational AI by combining persistent database management, cross-session memory, grounded document retrieval, generative dish visualization, server-side code execution, and structured A2UI card rendering.
+**Smart Recipe Concierge** is a state-of-the-art agentic application designed to transform home cooking, meal planning, and digital kitchen inventory management. Built on Google Cloud's Agent Development Kit (ADK) and deployed to **Vertex AI Agent Runtime**, the agent goes far beyond basic chatbots by combining persistent database management, cross-session memory, grounded document retrieval, generative dish visualization, server-side code execution, and structured A2UI card rendering.
 
 ---
 
@@ -27,50 +42,51 @@ Every capability listed below is fully implemented, wired, and verified in the c
 | :--- | :--- | :--- |
 | **🧠 Cross-Session Memory** | **Vertex AI Memory Bank** | `PreloadMemoryTool` & `add_session_to_memory` callback in `app/agent.py` automatically store and retrieve user dietary preferences across sessions. |
 | **🗄️ Digital Pantry Management** | **Google Cloud Firestore** | `search_pantry` tool queries the `pantry_inventory` NoSQL collection to list active ingredients, quantities, and expiration dates. |
-| **☁️ Persistent Media Storage** | **Google Cloud Storage (GCS)** | Dedicated public GCS bucket (`smart-recipe-assets-...`) hosts uploaded recipe photography and generated dish assets with public HTTPS URLs. |
+| **☁️ Persistent Media Storage** | **Google Cloud Storage (GCS)** | Dedicated public GCS bucket hosts uploaded recipe photography and generated dish assets with public HTTPS URLs. |
 | **📚 Grounded Knowledge RAG** | **Vertex AI RAG Engine** | `search_medical_guide` function tool performs semantic vector search over an indexed historical culinary and herbal reference manual. |
 | **🎨 Generative Dish Imagery** | **`gemini-3.1-flash-lite-image`** | `generate_dish_image` function tool generates 1024x1024 dish photos, saves them as Playground artifacts, and uploads JPEG bytes to GCS. |
 | **⚡ Server-Side Code Execution** | **Agent Engine Code Sandbox** | `AgentEngineSandboxCodeExecutor` enables safe Python code execution in an isolated container sandbox for recipe nutrition math. |
 | **📱 Rich Component Cards** | **A2UI Agent SDK (v0.8)** | `a2ui-agent-sdk` integration with `BasicCatalog` emits declarative JSON components (`Card`, `Column`, `Row`, `Text`, `Image`, `Icon`). |
-| **💻 Custom Web Frontend** | **FastAPI + A2A Protocol** | Same-origin FastAPI proxy (`frontend/main.py`) forwards chat turns via `a2a-sdk` to Agent Runtime, serving a glassmorphic dark-mode UI. |
+| **💻 Custom Web Frontend** | **FastAPI + A2A Protocol** | Same-origin FastAPI proxy (`frontend/main.py`) forwards chat turns via `a2a-sdk` to Agent Runtime, serving a glassmorphic dark-mode UI with Marked.js parsing. |
 
 ---
 
 ## 🏗️ Technical Architecture & Data Flow
 
-```
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                          Glassmorphic Web Frontend                              │
-│                    (Plus Jakarta Sans + A2UI Mini-Renderer)                     │
-└────────────────────────────────────────┬────────────────────────────────────────┘
-                                         │  HTTP /chat JSON
-                                         ▼
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                               FastAPI Proxy                                     │
-│                     (A2A Protocol Client with ADC Auth)                         │
-└────────────────────────────────────────┬────────────────────────────────────────┘
-                                         │  A2A Protocol / gRPC
-                                         ▼
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                      Vertex AI Agent Runtime Deployment                         │
-│                    (Root Agent powered by Gemini 2.5 Flash)                     │
-└─────┬──────────────────┬─────────────────┬─────────────────┬──────────────┬─────┘
-      │                  │                 │                 │              │
-      ▼                  ▼                 ▼                 ▼              ▼
-┌───────────┐      ┌───────────┐     ┌───────────┐     ┌───────────┐  ┌───────────┐
-│  Memory   │      │ Firestore │     │    GCS    │     │   RAG     │  │ Image Gen │
-│   Bank    │      │ Database  │     │  Bucket   │     │  Engine   │  │  Global   │
-└───────────┘      └───────────┘     └───────────┘     └───────────┘  └───────────┘
-```
+```mermaid
+flowchart TD
+    subgraph Client["📱 User Interface (Glassmorphic Web UI)"]
+        UI["Plus Jakarta Sans Web Interface\nMarked.js Markdown Parser\nA2UI Component Mini-Renderer"]
+    end
 
-1. **User Interaction**: The user submits queries through the custom web interface or suggestion pills.
-2. **A2A Translation**: The FastAPI proxy retrieves the agent's A2A card and sends messages via `a2a-sdk`.
-3. **Agent Reasoning**: The root agent evaluates context, retrieves long-term preferences from Vertex AI Memory Bank, and selects tools.
-4. **Tool Execution**:
-   - `search_pantry`: Connects to Firestore to pull real-time kitchen inventory.
-   - `search_medical_guide`: Performs semantic search on the Vertex AI RAG Engine vector corpus.
-   - `generate_dish_image`: Invokes `gemini-3.1-flash-lite-image` in the `global` region and saves image bytes to GCS.
-5. **A2UI Output Generation**: The `a2ui_callback` converts structured model responses into declarative A2UI card schemas for rich UI rendering.
+    subgraph Proxy["⚡ Middleware Proxy (FastAPI)"]
+        FastAPI["FastAPI Server (main.py)\nA2A Protocol Client\nGoogle Application Default Credentials"]
+    end
+
+    subgraph Runtime["🤖 Vertex AI Agent Runtime"]
+        Agent["Root Concierge Agent\n(Gemini 2.5 Flash Engine)\nReasoning & Tool Dispatch"]
+    end
+
+    subgraph Services["☁️ Google Cloud Backend Services"]
+        Memory["🧠 Vertex AI Memory Bank\n(Cross-Session Preference Memory)"]
+        Firestore["🗄️ Google Cloud Firestore\n(Digital Pantry Collection)"]
+        RAG["📚 Vertex AI RAG Engine\n(Herbal & Culinary Corpus)"]
+        GCS["☁️ Google Cloud Storage\n(Public Image Asset Bucket)"]
+        ImageGen["🎨 Gemini 3.1 Flash Lite Image\n(Global Image Generation Model)"]
+        Sandbox["⚡ Code Sandbox Executor\n(Isolated Python Sandbox)"]
+    end
+
+    UI -->|HTTP /chat JSON| FastAPI
+    FastAPI -->|A2A Protocol / gRPC| Agent
+    Agent <-->|Fetch / Save Fact Snippets| Memory
+    Agent <-->|search_pantry| Firestore
+    Agent <-->|search_medical_guide| RAG
+    Agent -->|generate_dish_image| ImageGen
+    ImageGen -->|Upload JPEG Bytes| GCS
+    Agent <-->|Python Nutrition Calculations| Sandbox
+    Agent -->|Structured A2UI JSON Cards & Formatted Text| FastAPI
+    FastAPI -->|Response Streams| UI
+```
 
 ---
 
@@ -79,7 +95,7 @@ Every capability listed below is fully implemented, wired, and verified in the c
 ### Prerequisites
 - Python 3.10+
 - Google Cloud SDK (`gcloud`) authenticated with a project
-- Node.js 18+ (for recording tools or dev frontend)
+- Node.js 18+ (for Playwright recording tools)
 
 ### 1. Environment Setup
 
@@ -122,17 +138,28 @@ Open your browser to the local server port (default `8080`) to interact with the
 
 ---
 
-## 📸 Recording Demos
+## 🎬 Recording Feature Demos
 
-To record an automated Playwright screen recording of the agent in action:
+To record individual Playwright screen recordings of the agent features:
 
 ```bash
+# 1. Pantry Search Demo
 NODE_PATH=./node_modules node .agents/skills/record-demo/record-agent.js \
   -q "Search my digital pantry and list ingredients" \
+  --wait 15000 \
+  -o pantry_demo.webm
+
+# 2. RAG Engine Herbal Remedy Demo
+NODE_PATH=./node_modules node .agents/skills/record-demo/record-agent.js \
   -q "Consult the medical guide for a natural herbal cough remedy" \
+  --wait 15000 \
+  -o rag_demo.webm
+
+# 3. Image Generation & Cloud Storage Demo
+NODE_PATH=./node_modules node .agents/skills/record-demo/record-agent.js \
   -q "Generate a vibrant dish photo of an authentic Italian pasta recipe" \
   --wait 30000 \
-  -o agent_demo.webm
+  -o image_demo.webm
 ```
 
 ---
@@ -149,11 +176,12 @@ smart-recipe-concierge/
 │   ├── main.py                # FastAPI proxy server using a2a-sdk
 │   ├── requirements.txt       # Frontend dependencies
 │   └── static/
-│       └── index.html         # Custom glassmorphic web UI with A2UI renderer
+│       └── index.html         # Custom glassmorphic web UI with Marked.js & A2UI renderer
 ├── agents-cli-manifest.yaml   # Agents CLI deployment configuration
 ├── pyproject.toml             # Python package definition and dependencies
-├── agent_demo.webm            # Full HD screen recording video
-├── demo.gif                   # Looping inline demo animation
+├── pantry_demo.gif            # Digital Pantry Search feature demo GIF
+├── rag_demo.gif               # Grounded RAG Search feature demo GIF
+├── image_demo.gif             # Generative Dish Photography feature demo GIF
 └── README.md                  # Project documentation & launch guide
 ```
 
